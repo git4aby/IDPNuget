@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WP.Idp.Auth - Complete Technical Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #7f8c8d;
+            margin-top: 25px;
+        }
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #555;
+        }
+        .toc {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 5px 0;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #3498db;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>WP.Idp.Auth - Complete Technical Documentation</h1>
+    
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#overview">1. Project Overview</a></li>
+            <li><a href="#architecture">2. Architecture & Design</a></li>
+            <li><a href="#multi-targeting">3. Multi-Targeting Strategy</a></li>
+            <li><a href="#components">4. Component Breakdown</a></li>
+            <li><a href="#implementation">5. Implementation Details</a></li>
+            <li><a href="#how-it-works">6. How It Works</a></li>
+            <li><a href="#usage">7. Usage Patterns</a></li>
+            <li><a href="#dependencies">8. Dependencies & Package Management</a></li>
+            <li><a href="#code-flow">9. Code Flow & Execution</a></li>
+            <li><a href="#extension">10. Extension Points & Customization</a></li>
+            <li><a href="#security">11. Security Considerations</a></li>
+            <li><a href="#troubleshooting">12. Troubleshooting</a></li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h2 id="overview">Project Overview</h2>
+    
+    <h3>Purpose</h3>
+    <p><strong>WP.Idp.Auth</strong> is a cross-version NuGet package that provides a <strong>unified authentication API</strong> for Identity Provider (IDP) authentication across multiple .NET framework versions. It solves the problem of maintaining separate authentication implementations for .NET Framework and .NET Core applications by providing a single, consistent interface.</p>
+    
+    <h3>Problem Statement</h3>
+    <p>Traditionally, developers face challenges when:</p>
+    <ul>
+        <li>Supporting both legacy .NET Framework applications and modern .NET Core applications</li>
+        <li>Maintaining separate authentication codebases for different frameworks</li>
+        <li>Dealing with different authentication libraries (OWIN for Framework, Microsoft.Identity.Web for Core)</li>
+        <li>Ensuring consistent authentication behavior across different framework versions</li>
+    </ul>
+    
+    <h3>Solution</h3>
+    <p>This package provides:</p>
+    <ul>
+        <li><strong>Single API</strong>: One interface (<code>IIdpAuthenticator</code>) that works across all frameworks</li>
+        <li><strong>Automatic Detection</strong>: The package automatically uses the correct implementation based on the target framework</li>
+        <li><strong>Unified Configuration</strong>: Similar configuration model for both Framework and Core applications</li>
+        <li><strong>Framework-Specific Optimizations</strong>: Uses the best authentication libraries for each framework</li>
+    </ul>
+    
+    <h3>Target Frameworks</h3>
+    <table>
+        <tr>
+            <th>Framework</th>
+            <th>Version</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>.NET Framework</td>
+            <td>4.5, 4.6, 4.7</td>
+            <td>Legacy enterprise applications</td>
+        </tr>
+        <tr>
+            <td>.NET Core</td>
+            <td>6.0</td>
+            <td>Modern cross-platform applications</td>
+        </tr>
+        <tr>
+            <td>.NET</td>
+            <td>8.0, 9.0</td>
+            <td>Latest .NET applications</td>
+        </tr>
+    </table>
+
+    <h2 id="architecture">Architecture & Design</h2>
+    
+    <h3>Design Principles</h3>
+    <ol>
+        <li><strong>Separation of Concerns</strong>: Abstractions, implementations, and shared models are separated</li>
+        <li><strong>Dependency Inversion</strong>: Code depends on abstractions, not concrete implementations</li>
+        <li><strong>Single Responsibility</strong>: Each component has one clear purpose</li>
+        <li><strong>Open/Closed Principle</strong>: Extensible without modification through interfaces</li>
+    </ol>
+    
+    <h3>Architectural Layers</h3>
+    <pre>
+┌─────────────────────────────────────────────────────────┐
+│                  Application Layer                       │
+│  (Uses IIdpAuthenticator interface)                     │
+└─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Abstraction Layer                       │
+│  IIdpAuthenticator (Common Interface)                     │
+└─────────────────────────────────────────────────────────┘
+                          │
+        ┌─────────────────┴─────────────────┐
+        ▼                                     ▼
+┌──────────────────┐              ┌──────────────────┐
+│  Core Adapter     │              │ Framework Adapter │
+│  (.NET Core/6+)   │              │ (.NET Framework) │
+└──────────────────┘              └──────────────────┘
+        │                                     │
+        └─────────────────┬─────────────────┘
+                          ▼
+┌─────────────────────────────────────────────────────────┐
+│              Shared Models Layer                         │
+│  TokenValidationResult, WpIdpOptions                     │
+└─────────────────────────────────────────────────────────┘
+    </pre>
+    
+    <h3>Project Structure</h3>
+    <pre>
+WP.Idp.Auth/
+├── Abstractions/              # Common interfaces
+│   └── IIdpAuthenticator.cs   # Main contract
+│
+├── CoreAdapter/               # .NET Core implementation
+│   ├── CoreIdpAuthenticator.cs      # Core authenticator
+│   └── CoreAuthExtensions.cs        # DI extension methods
+│
+├── FrameworkAdapter/          # .NET Framework implementation
+│   ├── FrameworkIdpAuthenticator.cs  # Framework authenticator
+│   └── FrameworkAuthExtensions.cs   # OWIN extension methods
+│
+└── SharedModels/              # Shared DTOs
+    ├── TokenValidationResult.cs     # Validation result model
+    └── WpIdpOptions.cs              # Configuration model
+    </pre>
+
+    <h2 id="multi-targeting">Multi-Targeting Strategy</h2>
+    
+    <h3>How Multi-Targeting Works</h3>
+    <p>The package uses <strong>conditional compilation</strong> to include only the relevant code for each target framework. This is achieved through:</p>
+    <ol>
+        <li><strong>Conditional Compilation Directives</strong>: <code>#if NET6_0_OR_GREATER</code> and <code>#if !NET6_0_OR_GREATER</code></li>
+        <li><strong>Conditional Package References</strong>: Different NuGet packages for different frameworks</li>
+        <li><strong>Single Codebase</strong>: All code in one project, compiled differently per target</li>
+    </ol>
+    
+    <h3>Conditional Compilation Flow</h3>
+    <pre><code>// CoreAdapter/CoreIdpAuthenticator.cs
+#if NET6_0_OR_GREATER
+    // This code ONLY compiles for .NET 6.0, 8.0, 9.0
+    using Microsoft.Identity.Web;
+    // ... Core implementation
+#endif
+
+// FrameworkAdapter/FrameworkIdpAuthenticator.cs
+#if !NET6_0_OR_GREATER
+    // This code ONLY compiles for .NET Framework 4.5, 4.6, 4.7
+    using Microsoft.Owin.Security.OpenIdConnect;
+    // ... Framework implementation
+#endif</code></pre>
+
+    <h2 id="components">Component Breakdown</h2>
+    
+    <h3>1. Abstractions Layer</h3>
+    <h4>IIdpAuthenticator Interface</h4>
+    <p><strong>Location</strong>: <code>Abstractions/IIdpAuthenticator.cs</code></p>
+    <p><strong>Purpose</strong>: Defines the contract that both Core and Framework implementations must follow.</p>
+    <pre><code>public interface IIdpAuthenticator
+{
+    Task&lt;TokenValidationResult&gt; ValidateTokenAsync(string token);
+    string GetAuthorizeUrl();
+}</code></pre>
+    
+    <h3>2. Shared Models Layer</h3>
+    <h4>TokenValidationResult</h4>
+    <p><strong>Location</strong>: <code>SharedModels/TokenValidationResult.cs</code></p>
+    <pre><code>public class TokenValidationResult
+{
+    public bool IsValid { get; set; }
+    public string? Subject { get; set; }
+    public string? TenantId { get; set; }
+    public string? Email { get; set; }
+    public Dictionary&lt;string, string&gt; AdditionalClaims { get; set; }
+    public string? ErrorMessage { get; set; }
+}</code></pre>
+    
+    <h4>WpIdpOptions</h4>
+    <p><strong>Location</strong>: <code>SharedModels/WpIdpOptions.cs</code></p>
+    <pre><code>public class WpIdpOptions
+{
+    public string Authority { get; set; }              // Required
+    public string ClientId { get; set; }              // Required
+    public string? ClientSecret { get; set; }         // Optional
+    public string RedirectUri { get; set; }            // Required
+    public string Scope { get; set; }                 // Default: "openid profile email"
+    public string ResponseType { get; set; }          // Default: "code id_token"
+    public bool RequireHttps { get; set; }            // Default: true
+    public string? MetadataAddress { get; set; }       // Optional
+    public List&lt;string&gt; ValidAudiences { get; set; }  // Optional
+    public List&lt;string&gt; ValidIssuers { get; set; }     // Optional
+}</code></pre>
+
+    <h2 id="usage">Usage Patterns</h2>
+    
+    <h3>Pattern 1: .NET Core with Configuration</h3>
+    <p><strong>appsettings.json</strong>:</p>
+    <pre><code>{
+  "WpIdpAuth": {
+    "Authority": "https://login.microsoftonline.com/{tenantId}",
+    "ClientId": "your-client-id",
+    "ClientSecret": "your-client-secret",
+    "RedirectUri": "https://localhost:5001/signin-oidc",
+    "Scope": "openid profile email"
+  }
+}</code></pre>
+    
+    <p><strong>Program.cs</strong>:</p>
+    <pre><code>var builder = WebApplication.CreateBuilder(args);
+
+// Add WP IDP Authentication
+builder.Services.AddWpIdpAuth(builder.Configuration);
+
+var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+app.Run();</code></pre>
+
+    <h3>Pattern 3: .NET Framework with OWIN</h3>
+    <p><strong>Startup.cs</strong>:</p>
+    <pre><code>[assembly: OwinStartup(typeof(YourApp.Startup))]
+
+namespace YourApp
+{
+    public class Startup
+    {
+        public void Configuration(IAppBuilder app)
+        {
+            app.UseWpIdpAuth(new WpIdpOptions
+            {
+                Authority = "https://login.microsoftonline.com/{tenantId}",
+                ClientId = "your-client-id",
+                ClientSecret = "your-client-secret",
+                RedirectUri = "https://localhost:44300/",
+                Scope = "openid profile email"
+            });
+        }
+    }
+}</code></pre>
+
+    <h2 id="dependencies">Dependencies & Package Management</h2>
+    
+    <h3>.NET Framework 4.x Dependencies</h3>
+    <table>
+        <tr>
+            <th>Package</th>
+            <th>Version</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>System.IdentityModel.Tokens.Jwt</td>
+            <td>6.35.0</td>
+            <td>JWT token handling</td>
+        </tr>
+        <tr>
+            <td>Microsoft.Owin.Security.OpenIdConnect</td>
+            <td>4.2.0</td>
+            <td>OpenID Connect middleware</td>
+        </tr>
+        <tr>
+            <td>Microsoft.Owin.Security.Jwt</td>
+            <td>4.2.0</td>
+            <td>JWT validation middleware</td>
+        </tr>
+        <tr>
+            <td>Microsoft.Owin.Security.Cookies</td>
+            <td>4.2.0</td>
+            <td>Cookie authentication</td>
+        </tr>
+    </table>
+    
+    <h3>.NET 6.0 Dependencies</h3>
+    <table>
+        <tr>
+            <th>Package</th>
+            <th>Version</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>System.IdentityModel.Tokens.Jwt</td>
+            <td>6.35.0</td>
+            <td>JWT token handling</td>
+        </tr>
+        <tr>
+            <td>Microsoft.Identity.Web</td>
+            <td>2.15.1</td>
+            <td>Microsoft's authentication library</td>
+        </tr>
+        <tr>
+            <td>Microsoft.Extensions.Configuration.Abstractions</td>
+            <td>6.0.0</td>
+            <td>Configuration support</td>
+        </tr>
+    </table>
+
+    <h2 id="security">Security Considerations</h2>
+    
+    <h3>Token Validation</h3>
+    <p><strong>Validated Properties</strong>:</p>
+    <ul>
+        <li>Issuer (prevents token from wrong IDP)</li>
+        <li>Audience (prevents token for wrong application)</li>
+        <li>Lifetime (prevents expired tokens)</li>
+        <li>Signature (prevents tampered tokens)</li>
+    </ul>
+    
+    <h3>Configuration Security</h3>
+    <p><strong>Best Practices</strong>:</p>
+    <ul>
+        <li>Store <code>ClientSecret</code> in secure configuration (Azure Key Vault, User Secrets)</li>
+        <li>Use HTTPS for all redirect URIs in production</li>
+        <li>Validate <code>ValidIssuers</code> and <code>ValidAudiences</code> explicitly</li>
+        <li>Use environment-specific configuration</li>
+    </ul>
+
+    <h2 id="troubleshooting">Troubleshooting</h2>
+    
+    <h3>Common Issues</h3>
+    
+    <h4>Issue 1: "Token validation failed: Invalid issuer"</h4>
+    <p><strong>Cause</strong>: Token issuer doesn't match configured issuers.</p>
+    <p><strong>Solution</strong>:</p>
+    <pre><code>options.ValidIssuers = new List&lt;string&gt; 
+{ 
+    "https://login.microsoftonline.com/{tenantId}/v2.0",
+    "https://login.microsoftonline.com/{tenantId}"
+};</code></pre>
+    
+    <h4>Issue 2: "Token validation failed: Invalid audience"</h4>
+    <p><strong>Cause</strong>: Token audience doesn't match client ID.</p>
+    <p><strong>Solution</strong>:</p>
+    <pre><code>options.ValidAudiences = new List&lt;string&gt; 
+{ 
+    options.ClientId,
+    "api://" + options.ClientId  // If using API scope
+};</code></pre>
+
+    <h2>Conclusion</h2>
+    <p><strong>WP.Idp.Auth</strong> provides a robust, cross-version solution for IDP authentication in .NET applications. By leveraging conditional compilation and framework-specific implementations, it offers:</p>
+    <ul>
+        <li>✅ <strong>Unified API</strong> across all .NET versions</li>
+        <li>✅ <strong>Automatic framework detection</strong></li>
+        <li>✅ <strong>Best-of-breed libraries</strong> for each framework</li>
+        <li>✅ <strong>Consistent behavior</strong> regardless of target framework</li>
+        <li>✅ <strong>Easy integration</strong> with extension methods</li>
+        <li>✅ <strong>Comprehensive token validation</strong></li>
+        <li>✅ <strong>Flexible configuration</strong></li>
+    </ul>
+    
+    <hr>
+    <p><strong>Document Version</strong>: 1.0<br>
+    <strong>Last Updated</strong>: 2024<br>
+    <strong>Package Version</strong>: 1.0.0</p>
+</body>
+</html>
+
